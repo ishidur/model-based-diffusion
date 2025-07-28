@@ -1,0 +1,135 @@
+<mujoco model="zx120">
+  <default>
+    <default class="robot">
+      <default class="visual">
+        <geom material="visualgeom" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom material="collision_material" condim="3" contype="0" conaffinity="1" priority="1" group="1" solref="0.005 1" friction="1 0.01 0.01" />
+        <equality solimp="0.99 0.999 1e-05" solref="0.005 1" />
+      </default>
+    </default>
+  </default>
+
+  <compiler angle="radian" />
+  <option gravity="0 0 -0.0981" />
+
+  <asset>
+    <material name="default_material" rgba="0.7 0.7 0.7 1" />
+    <material name="collision_material" rgba="1.0 0.28 0.1 0.9" />
+    <mesh name="zx120-crawler" file="./zx120_description/meshes/zx120-crawler.stl" />
+    <mesh name="zx120-body" file="./zx120_description/meshes/zx120-body.stl" />
+    <mesh name="zx120-boom" file="./zx120_description/meshes/zx120-boom.stl" />
+    <mesh name="zx120-arm" file="./zx120_description/meshes/zx120-arm.stl" />
+    <mesh name="zx120-bucket" file="./zx120_description/meshes/zx120-bucket.stl" />
+  </asset>
+
+  <worldbody>
+    <light pos="0 0 15"/>
+    <geom name="ground" type="plane" size="50 50 0.1"/>
+    <body name="base_link" pos="0.00000000 0.00000000 0.00000000" quat="1 0 0 0" childclass="robot">
+      <freejoint />
+      <body name="track_link" pos="0 0 0.1" quat="1.0 0.0 0.0 0.0">
+        <inertial pos="-0.155869 0 0.358402" quat="1.0 0.0 0.0 0.0" mass="1" diaginertia="1.0 1.0 1.0" />
+        <geom name="track_link_collision" pos="0 0 0" quat="1 0 0 0" type="mesh" mesh="zx120-crawler" class="collision" />
+        <geom name="track_link_visual" pos="0 0 0" quat="1 0 0 0" material="default_material" type="mesh" mesh="zx120-crawler" class="visual" />
+        <body name="body_link" pos="0 0 1" quat="1.0 0.0 0.0 0.0">
+          <joint name="swing_joint" type="hinge" ref="0.0" axis="0 0 2" />
+          <inertial pos="-0.501522 0 1.191169" quat="1.0 0.0 0.0 0.0" mass="0.03" diaginertia="1.0 1.0 1.0" />
+          <geom name="body_link_collision" pos="0 0 0" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="zx120-body" class="collision" />
+          <geom name="body_link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="default_material" type="mesh" mesh="zx120-body" class="visual" />
+          <body name="boom_link" pos="0.14 -0.16443 0.424" quat="0.7071067811882787 0.0 0.7071067811848163 0.0">
+            <joint name="boom_joint" type="hinge" ref="0.0" limited="true" range="-1.2217304764 0.767944870878" axis="0 1 0" />
+            <inertial pos="2.091062 0.055029 0.975556" quat="1.0 0.0 0.0 0.0" mass="0.03" diaginertia="1.0 1.0 1.0" />
+            <geom name="boom_link_collision" pos="0 0 0" quat="0.8295471813034682 0.0 -0.5584366338193358 0.0" type="mesh" mesh="zx120-boom" class="collision" />
+            <geom name="boom_link_visual" pos="0 0 0" quat="0.8295471813034682 0.0 -0.5584366338193358 0.0" material="default_material" type="mesh" mesh="zx120-boom" class="visual" />
+            <body name="arm_link" pos="0 0 4.6" quat="1.0 0.0 0.0 0.0">
+              <joint name="arm_joint" type="hinge" ref="0.0" limited="true" range="0.523598775598 2.65290046303" axis="0 1 0" />
+              <inertial pos="0.305996 0.000026 -0.912806" quat="1.0 0.0 0.0 0.0" mass="0.03" diaginertia="1.0 1.0 1.0" />
+              <geom name="arm_link_collision" pos="0 0 0" quat="-0.06914844865406194 -0.0 0.9976063813191737 -0.0" type="mesh" mesh="zx120-arm" class="collision" />
+              <geom name="arm_link_visual" pos="0 0 0" quat="-0.06914844865406194 -0.0 0.9976063813191737 -0.0" material="default_material" type="mesh" mesh="zx120-arm" class="visual" />
+              <body name="bucket_link" pos="0 0 2.519" quat="1.0 0.0 0.0 0.0">
+                <joint name="bucket_joint" type="hinge" ref="0.0" limited="true" range="-0.575958653158 2.49582083035" axis="0 1 0" />
+                <inertial pos="-0.442405 0.001740 0.247894" quat="1.0 0.0 0.0 0.0" mass="0.03" diaginertia="1.0 1.0 1.0" />
+                <geom name="bucket_link_collision" pos="0 0 0" quat="0.9305076219123143 0.0 0.36627252908604757 0.0" type="mesh" mesh="zx120-bucket" class="collision" />
+                <geom name="bucket_link_visual" pos="0 0 0" quat="0.9305076219123143 0.0 0.36627252908604757 0.0" material="default_material" type="mesh" mesh="zx120-bucket" class="visual" />
+                <body name="bucket_end_link" pos="0 0 1.23" quat="0.9063077870366848 0.0 0.4226182617406248 0.0">
+                  <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="1.0e-03" diaginertia="0.001 0.001 0.001" />
+                  <geom name="bucket_end_link_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="default_material" type="box" size="0.0005 0.0005 0.0005" class="visual" />
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="left_middle_wheel_link" pos="-0.155869 1 0.35" quat="0.7071067811865476 -0.7071067811865475 0.0 0.0">
+        <joint name="left_middle_wheel_joint" type="hinge" ref="0.0" axis="0 0 1" />
+        <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="10" diaginertia="5.0 5.0 5.0" />
+        <geom name="left_middle_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
+      </body>
+      <body name="left_front_wheel_link" pos="1.284131 1 0.35" quat="0.7071067811865476 -0.7071067811865475 0.0 0.0">
+        <joint name="left_front_wheel_joint" type="hinge" ref="0.0" axis="0 0 1" />
+        <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="10" diaginertia="5.0 5.0 5.0" />
+        <geom name="left_front_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
+      </body>
+      <body name="left_rear_wheel_link" pos="-1.595869 1 0.35" quat="0.7071067811865476 -0.7071067811865475 0.0 0.0">
+        <joint name="left_rear_wheel_joint" type="hinge" ref="0.0" axis="0 0 1" />
+        <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="10" diaginertia="5.0 5.0 5.0" />
+        <geom name="left_rear_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
+      </body>
+      <body name="right_middle_wheel_link" pos="-0.155869 -1 0.35" quat="0.7071067811865476 -0.7071067811865475 0.0 0.0">
+        <joint name="right_middle_wheel_joint" type="hinge" ref="0.0" axis="0 0 1" />
+        <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="10" diaginertia="5.0 5.0 5.0" />
+        <geom name="right_middle_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
+      </body>
+      <body name="right_front_wheel_link" pos="1.284131 -1 0.35" quat="0.7071067811865476 -0.7071067811865475 0.0 0.0">
+        <joint name="right_front_wheel_joint" type="hinge" ref="0.0" axis="0 0 1" />
+        <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="10" diaginertia="5.0 5.0 5.0" />
+        <geom name="right_front_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
+      </body>
+      <body name="right_rear_wheel_link" pos="-1.595869 -1 0.35" quat="0.7071067811865476 -0.7071067811865475 0.0 0.0">
+        <joint name="right_rear_wheel_joint" type="hinge" ref="0.0" axis="0 0 1" />
+        <inertial pos="0 0 0" quat="1.0 0.0 0.0 0.0" mass="10" diaginertia="5.0 5.0 5.0" />
+        <geom name="right_rear_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
+      </body>
+      <site name="base_link_site" pos="0 0 0" quat="1 0 0 0" />
+    </body>
+  </worldbody>
+
+  <actuator>
+    <velocity name="swing_joint_ctrl" joint="swing_joint" gear="1" ctrlrange="-0.3 0.3"  />
+    <velocity name="boom_joint_ctrl" joint="boom_joint" gear="1" forcerange="-500 500" ctrlrange="-6.159937255 6.159937255" />
+    <velocity name="arm_joint_ctrl" joint="arm_joint" gear="1" forcerange="-1 1" ctrlrange="-0.5 0.5" />
+    <velocity name="bucket_joint_ctrl" joint="bucket_joint" gear="1" forcerange="-1 1" ctrlrange="-0.5 0.5" />
+    <velocity name="left_middle_wheel_joint_ctrl" joint="left_middle_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
+    <velocity name="left_front_wheel_joint_ctrl" joint="left_front_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
+    <velocity name="left_rear_wheel_joint_ctrl" joint="left_rear_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
+    <velocity name="right_middle_wheel_joint_ctrl" joint="right_middle_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
+    <velocity name="right_front_wheel_joint_ctrl" joint="right_front_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
+    <velocity name="right_rear_wheel_joint_ctrl" joint="right_rear_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
+  </actuator>
+
+  <contact>
+    <exclude body1="track_link" body2="left_middle_wheel_link" />
+    <exclude body1="track_link" body2="left_front_wheel_link" />
+    <exclude body1="track_link" body2="left_rear_wheel_link" />
+    <exclude body1="track_link" body2="right_middle_wheel_link" />
+    <exclude body1="track_link" body2="right_middle_wheel_link" />
+    <exclude body1="track_link" body2="right_middle_wheel_link" />
+    <exclude body1="track_link" body2="body_link" />
+    <exclude body1="body_link" body2="boom_link" />
+    <exclude body1="boom_link" body2="arm_link" />
+    <exclude body1="arm_link" body2="bucket_link" />
+  </contact>
+
+  <sensor>
+    <jointactuatorfrc  name="boom_joint_force" joint="boom_joint" />
+    <framepos name="base_link_site_pos" objtype="site" objname="base_link_site" />
+    <framequat name="base_link_site_quat" objtype="site" objname="base_link_site" />
+    <framelinvel name="base_link_site_linvel" objtype="site" objname="base_link_site" />
+    <frameangvel name="base_link_site_angvel" objtype="site" objname="base_link_site" />
+    <velocimeter name="base_link_site_vel" site="base_link_site" />
+    <framepos name="bucket_end_pos" objtype="body" objname="bucket_end_link" reftype="site" refname="base_link_site" />
+    <framequat  name="bucket_end_quat" objtype="body" objname="bucket_end_link" reftype="site" refname="base_link_site" />
+  </sensor>
+</mujoco>
