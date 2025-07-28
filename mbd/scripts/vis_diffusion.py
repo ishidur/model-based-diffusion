@@ -137,6 +137,6 @@ else:
         pickle.dump(rollouts, f)
     print("saved rollouts")
 json_file = dumps(env.sys.tree_replace({"opt.timestep": env.dt}), rollouts)
-html_file = render_from_json(json_file, height=500, colab=False, base_url=None)
+html_file = render_from_json(json_file, height=500, colab=True, base_url=None)
 with open(f"{path}/render_diffusion.html", "w") as f:
     f.write(html_file)
