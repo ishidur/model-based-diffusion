@@ -15,7 +15,6 @@ class ExcavatorPose(PipelineEnv):
     def __init__(self):
         mj = mujoco.MjModel.from_xml_path(f"{mbd.__path__[0]}/assets/zx120/zx120.xml")
         sys = mjcf.load_model(mj)
-
         super().__init__(sys=sys, backend="mjx")
 
     def reset(self, rng: jax.Array) -> State:
@@ -35,22 +34,18 @@ class ExcavatorPose(PipelineEnv):
     def step(self, state: State, action: jax.Array) -> State:
         """Runs one timestep of the environment's dynamics."""
         pipeline_state = self.pipeline_step(state.pipeline_state, action)
-
         obs = self._get_obs(pipeline_state, action)
         reward = self._get_reward(pipeline_state)
 
         return state.replace(pipeline_state=pipeline_state, obs=obs, reward=reward)
 
     def _get_obs(self, pipeline_state: base.State, action: jax.Array) -> jax.Array:
-        print(pipeline_state.sensordata, pipeline_state.q, pipeline_state.qd)
         return jnp.concatenate([pipeline_state.q, pipeline_state.qd], axis=-1)
 
     def _get_reward(self, pipeline_state: base.State) -> jax.Array:
-        return (
-            pipeline_state.x.pos[0, 0] * 1.0
-            - jnp.clip(jnp.abs(pipeline_state.x.pos[0, 2] - 1.3), -1.0, 1.0) * 1.0
-            - jnp.abs(pipeline_state.x.pos[0, 1]) * 0.1
-        )
+        bucket_end = pipeline_state.sensordata[:7]
+        target = pipeline_state.sensordata[7:]
+        return -jnp.sum(jnp.abs(bucket_end[:3] - target[:3]))
 
 
 def main():
@@ -60,10 +55,9 @@ def main():
     env_reset = jax.jit(env.reset)
     state = env_reset(rng)
     rollout = [state.pipeline_state]
-    # print(state)
-    for _ in range(50):
+    for _ in range(200):
         rng, rng_act = jax.random.split(rng)
-        act = jax.random.uniform(rng_act, (env.action_size,), minval=-0.5, maxval=0.5)
+        act = jax.random.uniform(rng_act, (env.action_size,), minval=-1.0, maxval=1.0)
         state = env_step(state, act)
         rollout.append(state.pipeline_state)
     webpage = html.render(env.sys.tree_replace({"opt.timestep": env.dt}), rollout)

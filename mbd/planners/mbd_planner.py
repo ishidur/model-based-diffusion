@@ -60,6 +60,7 @@ def run_diffusion(args: Args):
     }
     Hsample_recommend = {
         "pushT": 40,
+        "excavatorpose": 100,
     }
     if not args.disable_recommended_params:
         args.temp_sample = temp_recommend.get(args.env_name, args.temp_sample)
