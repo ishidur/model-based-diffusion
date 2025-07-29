@@ -5,7 +5,7 @@ import os
 # Get the absolute path to the directory of the script
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Construct the absolute path to the MJCF file
-xml_path = os.path.join(script_dir, "assets/zx120/zx120.mjcf")
+xml_path = os.path.join(script_dir, "mbd/assets/zx120/zx120.xml")
 
 # Load the model
 m = mujoco.MjModel.from_xml_path(xml_path)
@@ -18,11 +18,11 @@ with mujoco.viewer.launch_passive(m, d) as viewer:
 
     # Get the actuator IDs for the wheels
     wheel_actuators = [
-        "left_middle_wheel_joint_ctrl",
-        "left_front_wheel_joint_ctrl",
+        # "left_middle_wheel_joint_ctrl",
+        # "left_front_wheel_joint_ctrl",
         "left_rear_wheel_joint_ctrl",
-        "right_middle_wheel_joint_ctrl",
-        "right_front_wheel_joint_ctrl",
+        # "right_middle_wheel_joint_ctrl",
+        # "right_front_wheel_joint_ctrl",
         "right_rear_wheel_joint_ctrl",
     ]
     actuator_ids = [m.actuator(name).id for name in wheel_actuators]
