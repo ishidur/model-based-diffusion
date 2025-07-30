@@ -12,8 +12,12 @@
   </default>
 
   <compiler angle="radian" />
-  <option timestep="0.01" gravity="0 0 -0.0981" />
+  <option timestep="0.02" integrator="Euler" gravity="0 0 -0.0981" />
 
+  <custom>
+    <!-- brax custom params -->
+    <numeric data="0 -0.5 1.6 0.96" name="init_qpos"/>
+  </custom>
   <asset>
     <material name="default_material" rgba="0.7 0.7 0.7 1" />
     <material name="collision_material" rgba="1.0 0.28 0.1 0.9" />
@@ -27,7 +31,7 @@
   <worldbody>
     <light pos="0 0 15"/>
     <geom name="ground" type="plane" size="10 10 0.1"/>
-    <body name="base_link" pos="0 0 0" quat="1 0 0 0" childclass="robot">
+    <!-- <body name="base_link" pos="0 0 0" quat="1 0 0 0" childclass="robot"> -->
       <!-- <freejoint /> -->
       <body name="track_link" pos="0 0 0.1" quat="1 0 0 0">
         <inertial pos="-0.155869 0 0.358402" quat="1 0 0 0" mass="1" diaginertia="1 1 1" />
@@ -89,7 +93,7 @@
         <inertial pos="0 0 0" quat="1 0 0 0" mass="10" diaginertia="5.0 5.0 5.0" />
         <geom name="right_rear_wheel_link_collision" pos="0 0 0" quat="1 0 0 0" type="cylinder" size="0.35 0.25" class="collision" friction="0.7 0.005 0.0001" solimp="0.9 0.95 0.001" solref="0.02 1" />
       </body> -->
-    </body>
+    <!-- </body> -->
     <body name="goal" pos="0 5 4" quat="0.5 0.5 -0.5 0.5">
         <geom name="goal_visual" quat="0.9305076219123143 0.0 0.36627252908604757 0.0" material="default_material" type="mesh" mesh="zx120-bucket" class="visual" />
         <site name="goal_end_site" pos="0 0 1.23" quat="0.9063077870366848 0.0 0.4226182617406248 0.0" />
@@ -97,10 +101,10 @@
   </worldbody>
 
   <actuator>
-    <velocity name="swing_joint_ctrl" joint="swing_joint" gear="1" />
-    <velocity name="boom_joint_ctrl" joint="boom_joint" gear="1" forcerange="-500 500" ctrlrange="-0.05 0.05" />
-    <velocity name="arm_joint_ctrl" joint="arm_joint" gear="1" forcerange="-1 1" ctrlrange="-0.05 0.05" />
-    <velocity name="bucket_joint_ctrl" joint="bucket_joint" gear="1" forcerange="-1 1" ctrlrange="-0.05 0.05" />
+    <motor name="swing_joint_ctrl" joint="swing_joint" gear="10" forcerange="-10 10" ctrlrange="-10 10"  />
+    <motor name="boom_joint_ctrl" joint="boom_joint" gear="10" forcerange="-500 500" ctrlrange="-10 10" />
+    <motor name="arm_joint_ctrl" joint="arm_joint" gear="10" forcerange="-10 10" ctrlrange="-10 10" />
+    <motor name="bucket_joint_ctrl" joint="bucket_joint" gear="10" forcerange="-10 10" ctrlrange="-10 10" />
     <!-- <velocity name="left_middle_wheel_joint_ctrl" joint="left_middle_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
     <velocity name="left_front_wheel_joint_ctrl" joint="left_front_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />
     <velocity name="left_rear_wheel_joint_ctrl" joint="left_rear_wheel_joint" gear="1" ctrlrange="-0.5 0.5" />

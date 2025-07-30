@@ -8,15 +8,16 @@ import numpy as np
 from jax.tree_util import tree_map
 import pickle
 import os
+import mujoco
 
 import mbd
 
 jax.config.update("jax_platform_name", "cpu")
 
-env_name = "humanoidtrack"
+env_name = "excavatorpose"
 env = mbd.envs.get_env(env_name)
 step_env_jit = jax.jit(env.step)
-Hsample = 50
+Hsample = 100
 plot_interval = 10
 path = f"{mbd.__path__[0]}/../results/{env_name}"
 mu_0ts = jnp.load(f"{path}/mu_0ts.npy")
@@ -24,8 +25,22 @@ rng = jax.random.PRNGKey(0)
 mu_0_random = jax.random.normal(rng, (Hsample, env.action_size))
 mu_0ts = jnp.concatenate([mu_0_random[None], mu_0ts], axis=0)
 
-def dumps(sys, statess) -> str:
 
+def _get_mesh(mj: mujoco.MjModel, i: int) -> tuple[np.ndarray, np.ndarray]:
+    """Gets mesh from mj at index i."""
+    last = (i + 1) >= mj.nmesh
+    face_start = mj.mesh_faceadr[i]
+    face_end = mj.mesh_faceadr[i + 1] if not last else mj.mesh_face.shape[0]
+    face = mj.mesh_face[face_start:face_end]
+
+    vert_start = mj.mesh_vertadr[i]
+    vert_end = mj.mesh_vertadr[i + 1] if not last else mj.mesh_vert.shape[0]
+    vert = mj.mesh_vert[vert_start:vert_end]
+
+    return vert, face
+
+
+def dumps(sys, statess) -> str:
     d = _to_dict(sys)
 
     # Fill in empty link names
@@ -47,6 +62,11 @@ def dumps(sys, statess) -> str:
             "size": sys.geom_size[id_],
         }
 
+        if geom["name"] == "Mesh":
+            vert, face = _get_mesh(sys.mj_model, sys.geom_dataid[id_])
+            geom["vert"] = vert
+            geom["face"] = face
+
         link_geoms.setdefault(link_names[link_idx], []).append(_to_dict(geom))
 
     # repeat link_geoms for each body across all timesteps
@@ -67,9 +87,11 @@ def dumps(sys, statess) -> str:
                     geom_new["rgba"] = [0.0, 1.0, 0.0, 1.0]
                 elif "_ref" in name:
                     if "torso" in name or "thigh" in name:
-                        geom_new["link_idx"] = geom["link_idx"] + k * (len(link_names) - 1)
+                        geom_new["link_idx"] = geom["link_idx"] + k * (
+                            len(link_names) - 1
+                        )
                         a = k / traj_len * 0.8 + 0.2
-                        geom_new["rgba"] = [(1-a), 1.0, (1-a), 1.0]
+                        geom_new["rgba"] = [(1 - a), 1.0, (1 - a), 1.0]
                     else:
                         geom_new["rgba"] = [1.0, 1.0, 1.0, 0.0]
                 else:
@@ -99,14 +121,19 @@ def dumps(sys, statess) -> str:
             statess_new.append(states_new)
         statess = statess_new
     statess_list = []
+
+    def state_concat(x):
+        if x[0].ndim == 0:
+            return jnp.stack(x)
+        return jnp.concat(x)
+
     for states in statess:
-        states_map = jax.tree.map(lambda *x: jnp.concat(x), *states)
+        states_map = jax.tree.map(lambda *x: state_concat(x), *states)
         statess_list.append(states_map)
     for state in statess[-1]:
-        states = jax.tree.map(lambda x: jnp.concat([x] * traj_len), state)
+        states = jax.tree.map(lambda x: state_concat([x] * traj_len), state)
         statess_list.append(states)
-    d['states'] = {'x': [_to_dict(s.x) for s in statess_list]}
-
+    d["states"] = {"x": [_to_dict(s.x) for s in statess_list]}
 
     return json.dumps(d)
 

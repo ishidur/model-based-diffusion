@@ -15,7 +15,7 @@ class ExcavatorPose(PipelineEnv):
     def __init__(self):
         mj = mujoco.MjModel.from_xml_path(f"{mbd.__path__[0]}/assets/zx120/zx120.xml")
         sys = mjcf.load_model(mj)
-        super().__init__(sys=sys, backend="mjx")
+        super().__init__(sys=sys, backend="mjx", n_frames=5)
 
     def reset(self, rng: jax.Array) -> State:
         """Resets the environment to an initial state."""
@@ -23,7 +23,7 @@ class ExcavatorPose(PipelineEnv):
 
         low, hi = -0.01, 0.01
         qpos = self.sys.init_q + jax.random.uniform(
-            rng1, (self.sys.q_size(),), minval=-0.01, maxval=0.01
+            rng1, (self.sys.q_size(),), minval=low, maxval=hi
         )
         qvel = jax.random.uniform(rng2, (self.sys.qd_size(),), minval=low, maxval=hi)
         pipeline_state = self.pipeline_init(qpos, qvel)
@@ -54,10 +54,10 @@ def main():
     env_step = jax.jit(env.step)
     env_reset = jax.jit(env.reset)
     state = env_reset(rng)
-    rollout = [state.pipeline_state]
-    for _ in range(200):
+    rollout = []
+    for i in range(100):
         rng, rng_act = jax.random.split(rng)
-        act = jax.random.uniform(rng_act, (env.action_size,), minval=-1.0, maxval=1.0)
+        act = jax.random.uniform(rng_act, (env.action_size,), minval=-1, maxval=1)
         state = env_step(state, act)
         rollout.append(state.pipeline_state)
     webpage = html.render(env.sys.tree_replace({"opt.timestep": env.dt}), rollout)
